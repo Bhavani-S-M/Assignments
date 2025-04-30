@@ -1,0 +1,67 @@
+#!/bin/bash
+
+FILE="sig.conf"
+
+# Ask user for input
+echo "Enter Component Name (INGESTOR/JOINER/WRANGLER/VALIDATOR): "
+read component
+component=$(echo "$component" | tr '[:lower:]' '[:upper:]')
+
+echo "Enter Scale (MID/HIGH/LOW): "
+read scale
+scale=$(echo "$scale" | tr '[:lower:]' '[:upper:]')
+
+echo "Enter View (Auction/Bid): "
+read view
+view=$(echo "$view" | tr '[:lower:]' '[:upper:]')
+
+echo "Enter Count (single digit number): "
+read count
+
+# Validate inputs
+if [[ "$component" != "INGESTOR" && "$component" != "JOINER" && "$component" != "WRANGLER" && "$component" != "VALIDATOR" ]]; then
+    echo "Invalid component name"
+    exit 1
+fi
+
+if [[ "$scale" != "MID" && "$scale" != "HIGH" && "$scale" != "LOW" ]]; then
+    echo "Invalid scale"
+    exit 1
+fi
+
+if [[ "$view" != "AUCTION" && "$view" != "BID" ]]; then
+    echo "Invalid view"
+    exit 1
+fi
+
+if [[ ! "$count" =~ ^[0-9]$ ]]; then
+    echo "Invalid count"
+    exit 1
+fi
+
+# Adjust View for output
+                                                                  if [[ "$view" == "AUCTION" ]]; then
+    view="Auction"
+else
+    view="Bid"
+fi
+if [[ "$view" == "Auction" || "$view" == "auction" ]]; then
+    tag="vdopiasample"
+else
+    tag="vdopiasample-bid"
+fi
+
+newline="$view:$scale:$component:ETL:$tag-etl=$count"
+
+# If file doesn't exist or is empty, create it
+
+# If the component already exists, replace the line
+if grep -q ":$component_up:" sig.conf; then
+    sed -i "s/^.*:$component_up:.*\$/$newline/" sig.conf
+else
+    echo "$newline" >> sig.conf
+fi
+echo "Configuration updated successfully!"
+
+
+
