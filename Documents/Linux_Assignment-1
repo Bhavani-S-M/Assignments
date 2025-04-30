@@ -1,0 +1,113 @@
+1. Configure smtp in localhost.
+Ans:
+	Step 1 : Install postfix
+		sudo apt install postfix
+			##Directly We cann't able to install smpt in linux that's why we have to install softwares like postfix which implements the smtp protocol.
+			
+	Step 2 : Install mailutils
+		sudo apt install mailutils
+		
+	Step 3 : Now we can send the mail to localhost users
+		echo "This is the first message" | mail -s "Test subject" testuser
+			
+2.Create a user in your localhost, which should not be able to execute the sudo command.
+Ans:
+	Step 1 : Command to create a user without sudo privileges:
+			sudo adduser testuser
+			
+	Step 2 : Command to check whether user have sudo privileges or not:
+			sudo -l
+				# It directly says whether the user can able to run sudo commands or not
+	
+3. Configure your system in such a way that when a user type and executes a describe command from anywhere of the system it must list all the file and folders of the user's current directory.
+Ans:
+	Step 1 : Create a script in /usr/local/bin path and give file name as describe:
+		sudo nano /usr/local/bin/describe
+		
+	Step 2 : Add below code for that file:
+		#!/bin/bash
+		ls 
+	
+	Step 3 : Make that describe as executable:
+		sudo chmod a+x /usr/local/bin/describe
+	
+	Now user can run the command describe form any where.
+	
+4.Users can put a compressed file at any path of the linux file system. The name of the file will be research and the extension will be of compression type, example for gzip type extension will be .gz. You have to fine the file and check the compression type and uncompress it:
+Ans:
+	Step 1: Compressing a file
+			gzip -c /home/sigmoid/research > /home/sigmoid/temp/research.gz
+				## This command will compress the research file and stores it into temp directory
+				
+	Step 2: Checking that if compressed is file is there or not
+			ls -l
+			  or
+			find -type f -name "reseach.*"
+				## From using this command we can find reseach.gz file
+				
+	Step 3: Uncompressing the file
+			gunzip -c /home/sigmoid/temp/research.gz > /home/sigmoid/research
+				## This command will extract the file and stores in sigmoid's home directory
+				
+				
+5. Configure your system in such a way that any user of your system creates a file then there should not be permission to do any activity in that file. Note: Don't use the chmod command.
+Ans:
+	Removing permissions for all users.
+	Step 1: Goto etc/profile file and add umask 077 line
+		command - sudo nano /etc/profile
+			## Add umask 077 at the end of the line and save that file
+	
+	Step 2: create a new file in anywhere and permission
+		touch testfile | ls -ltr
+			## Now we can see that file is created and it contains only user permissions it doesnot have group or other permissions.
+			
+6. Create a service with the name showtime, after starting the service, every minute it should print the current time in a file in the user home directory.
+Ans: 
+	Step 1: First we have to create script in /usr/local/bin/ folder:
+		sudo nano /usr/local/bin/showtime.sh
+		
+	Step 2: Add the following lines to the script:
+		#!/bin/bash
+		while true; do
+  			echo "Current time: $(date)" >> /home/$USER/showtime.log
+  			sleep 60
+		done
+
+	Step 3: Change the permission of that file and make as executable
+		sudo chmod a+x /usr/local/bin/showtime.sh
+		
+	Step 4: Then create service of showtime
+		sudo nano /etc/systemd/system/showtime.service
+		
+	Step 5: Add the following lines to that file:
+		GNU nano 7.2                /etc/systemd/system/showtime.service                         
+		[Unit]
+		Description=Show current time every minute
+		After=network.target
+
+		[Service]
+		ExecStart=/usr/local/bin/showtime.sh
+		Restart=always
+		User=sigmoid
+
+		[Install]
+		WantedBy=multi-user.target
+		
+	Step 6: Enable the services by running following commands one by one:
+		sudo systemctl daemon-reexec
+		sudo systemctl daemon-reload
+		sudo systemctl enable showtime
+		
+	Step 7: Start the service by running following commands:
+		sudo systemctl start showtime	#it will start writing in file
+		sudo systemctl stop showtime	#it will stop writing to file
+		sudo systemctl status showtime	#it shows status
+		
+	If we want to see the output of that file we can use the following command
+	cat showtime.log
+
+
+	
+
+
+	
