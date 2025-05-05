@@ -40,7 +40,7 @@ if [[ ! "$count" =~ ^[0-9]$ ]]; then
 fi
 
 # Adjust View for output
-                                                                  if [[ "$view" == "AUCTION" ]]; then
+if [[ "$view" == "AUCTION" ]]; then
     view="Auction"
 else
     view="Bid"
@@ -56,12 +56,9 @@ newline="$view:$scale:$component:ETL:$tag-etl=$count"
 # If file doesn't exist or is empty, create it
 
 # If the component already exists, replace the line
-if grep -q ":$component_up:" sig.conf; then
-    sed -i "s/^.*:$component_up:.*\$/$newline/" sig.conf
+if grep -q "$component" sig.conf; then
+    sed -i "s/^.*:$component:.*\$/$newline/" sig.conf
 else
     echo "$newline" >> sig.conf
 fi
 echo "Configuration updated successfully!"
-
-
-
